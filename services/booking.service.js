@@ -15,11 +15,6 @@ class BookingService {
         throw new Error('Event is full');
       }
 
-      // NEW: Block direct booking for paid events
-      if (event.isPaid) {
-        throw new Error('This is a paid event. Please pay to confirm booking.');
-      }
-
       // Check for double booking
       const existingBooking = await Booking.findOne({ userId, eventId }).session(session);
       if (existingBooking && existingBooking.status === 'confirmed') {
@@ -30,11 +25,10 @@ class BookingService {
       let booking;
       if (existingBooking && existingBooking.status === 'cancelled') {
         existingBooking.status = 'confirmed';
-        existingBooking.paymentStatus = 'completed';
         existingBooking.bookingDate = Date.now();
         booking = await existingBooking.save({ session });
       } else {
-        booking = await Booking.create([{ userId, eventId, paymentStatus: 'completed' }], { session });
+        booking = await Booking.create([{ userId, eventId }], { session });
         booking = booking[0];
       }
 

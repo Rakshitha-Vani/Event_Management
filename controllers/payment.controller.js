@@ -48,8 +48,31 @@ exports.verifyPayment = async (req, res, next) => {
       razorpay_order_id, 
       razorpay_payment_id, 
       razorpay_signature,
-      eventId 
+      eventId,
+      isSimulated 
     } = req.body;
+
+    // Handle Simulated Payment for Development
+    if (isSimulated) {
+      const event = await Event.findById(eventId);
+      if (!event) return res.status(404).json({ success: false, error: 'Event not found' });
+      
+      const booking = await Booking.create({
+        userId: req.user._id,
+        eventId,
+        status: 'confirmed',
+        paymentStatus: 'completed',
+        razorpayPaymentId: 'SIMULATED_PAYMENT_' + Date.now()
+      });
+
+      event.availableSeats -= 1;
+      await event.save();
+
+      const io = req.app.get('socketio');
+      io.emit('bookingCreated', { eventId, booking });
+
+      return res.status(200).json({ success: true, message: "Simulated payment successful", data: booking });
+    }
 
     const sign = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSign = crypto

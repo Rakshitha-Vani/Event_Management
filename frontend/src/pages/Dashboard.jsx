@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useEvents } from '../hooks/useEvents';
 import EventCard from '../components/EventCard';
 import { Search, Filter, Loader2, Plus, AlertCircle } from 'lucide-react';
 import eventService from '../services/eventService';
 import { useAuth } from '../context/AuthContext';
-
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { events, loading, error, fetchEvents } = useEvents();
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,11 +29,6 @@ const Dashboard = () => {
   }, [searchTerm, categoryFilter]);
 
   const handleBooking = async (event) => {
-    // DEBUG LOG: Let's see what the database sent us
-    console.log("🔥 BOOKING ATTEMPT:", event.title);
-    console.log("💰 IS PAID?", event.isPaid);
-    console.log("💵 PRICE:", event.price);
-
     if (!user) {
       setFeedback({ type: 'error', message: 'Please login to book events' });
       return;
@@ -41,68 +36,16 @@ const Dashboard = () => {
 
     try {
       setBookingLoadingId(event._id);
-
-      // STRICT CHECK: Ensure we handle undefined/null as False
-      if (event.isPaid !== true) {
-        console.log("✅ PROCESSING AS FREE EVENT");
-        const result = await eventService.bookEvent(event._id);
-        if (result.success) {
-          setFeedback({ type: 'success', message: 'Event booked successfully!' });
-          fetchEvents();
-        }
-      } else {
-        // Paid Event Flow (Razorpay)
-        // 1. Create Order
-        const orderResult = await eventService.createPaymentOrder(event._id);
-        if (!orderResult.success) throw new Error(orderResult.error);
-
-        const order = orderResult.data;
-
-        // 2. Open Razorpay Checkout
-        const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_default', // User should set this in .env
-          amount: order.amount,
-          currency: order.currency,
-          name: "Eventify",
-          description: `Booking for ${event.title}`,
-          image: event.image || "/logo.png",
-          order_id: order.id,
-          handler: async (response) => {
-            try {
-              // 3. Verify Payment on Backend
-              const verifyResult = await eventService.verifyPayment({
-                ...response,
-                eventId: event._id
-              });
-              
-              if (verifyResult.success) {
-                setFeedback({ type: 'success', message: 'Payment successful! Booking confirmed.' });
-                fetchEvents();
-              }
-            } catch (err) {
-              setFeedback({ type: 'error', message: err || 'Payment verification failed' });
-            }
-          },
-          prefill: {
-            name: user.name,
-            email: user.email,
-          },
-          theme: {
-            color: "#6366f1",
-          },
-        };
-
-        const rzp = new window.Razorpay(options);
-        rzp.on('payment.failed', function (response){
-          setFeedback({ type: 'error', message: 'Payment failed. Please try again.' });
-        });
-        rzp.open();
+      const result = await eventService.bookEvent(event._id);
+      if (result.success) {
+        setFeedback({ type: 'success', message: 'Event booked successfully!' });
+        fetchEvents();
       }
     } catch (err) {
       setFeedback({ type: 'error', message: err || 'Something went wrong' });
     } finally {
       setBookingLoadingId(null);
-      setTimeout(() => setFeedback({ type: '', message: '' }), 4000);
+      setTimeout(() => setFeedback({ type: '', message: '' }), 3000);
     }
   };
 

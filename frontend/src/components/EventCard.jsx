@@ -18,9 +18,6 @@ const EventCard = ({ event, onBook, isBooking }) => {
         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-primary-700 shadow-sm uppercase tracking-wider">
           {event.category}
         </div>
-        <div className="absolute top-4 right-4 bg-gray-900/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm">
-          {event.price === 0 ? 'Free' : formatCurrency(event.price)}
-        </div>
       </div>
 
       {/* Content */}
@@ -31,14 +28,6 @@ const EventCard = ({ event, onBook, isBooking }) => {
         <p className="text-gray-500 text-sm mb-4 line-clamp-2 leading-relaxed">
           {event.description}
         </p>
-
-        {event.isPaid && (
-          <div className="bg-primary-50 p-4 rounded-2xl mb-4 border border-primary-100 animate-pulse">
-            <p className="text-primary-700 text-xs font-bold flex items-center gap-2">
-              ⚠️ This is a paid event. You need to pay {formatCurrency(event.price)} to book this event.
-            </p>
-          </div>
-        )}
 
         <div className="space-y-3 mb-6">
           <div className="flex items-center gap-2 text-gray-600">
@@ -80,7 +69,7 @@ const EventCard = ({ event, onBook, isBooking }) => {
               'Event Passed'
             ) : event.availableSeats > 0 ? (
               <>
-                {event.isPaid ? 'Pay & Book' : 'Book Now'}
+                Book Now
                 <ArrowRight size={18} />
               </>
             ) : (

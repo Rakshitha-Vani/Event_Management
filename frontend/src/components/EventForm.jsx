@@ -12,8 +12,6 @@ const EventForm = () => {
     location: '',
     category: 'Technology',
     capacity: '',
-    isPaid: false,
-    price: '',
   });
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -142,42 +140,6 @@ const EventForm = () => {
               placeholder="Number of participants"
               value={formData.capacity}
               onChange={(e) => setFormData({...formData, capacity: e.target.value})}
-            />
-          </div>
-        </div>
-
-        {/* Pricing Category */}
-        <div className="grid md:grid-cols-2 gap-6 p-6 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-          <div className="space-y-4">
-            <label className="font-bold flex items-center gap-2 underline decoration-primary-500">Event Type</label>
-            <div className="flex gap-4">
-              <button 
-                type="button"
-                onClick={() => setFormData({ ...formData, isPaid: false, price: 0 })}
-                className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${!formData.isPaid ? 'bg-primary-600 text-white shadow-lg' : 'bg-white text-gray-400 border border-gray-100 hover:bg-gray-50'}`}
-              >
-                Free
-              </button>
-              <button 
-                type="button"
-                onClick={() => setFormData({ ...formData, isPaid: true })}
-                className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${formData.isPaid ? 'bg-primary-600 text-white shadow-lg' : 'bg-white text-gray-400 border border-gray-100 hover:bg-gray-50'}`}
-              >
-                Paid
-              </button>
-            </div>
-          </div>
-          
-          <div className={`space-y-2 transition-all duration-300 ${formData.isPaid ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
-            <label className="font-bold flex items-center gap-2">Ticket Price (INR)</label>
-            <input 
-              type="number"
-              disabled={!formData.isPaid}
-              required={formData.isPaid}
-              className="w-full px-6 py-4 bg-white border border-gray-100 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none shadow-sm"
-              placeholder="0.00"
-              value={formData.price}
-              onChange={(e) => setFormData({...formData, price: e.target.value})}
             />
           </div>
         </div>

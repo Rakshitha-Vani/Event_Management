@@ -8,7 +8,6 @@ const authRoutes = require('./routes/auth.routes');
 const eventRoutes = require('./routes/event.routes');
 const bookingRoutes = require('./routes/booking.routes');
 const uploadRoutes = require('./routes/upload.routes');
-const paymentRoutes = require('./routes/payment.routes');
 
 const app = express();
 
@@ -25,7 +24,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/upload', uploadRoutes);
-app.use('/api/payment', paymentRoutes);
 
 // Root route
 app.get('/', (req, res) => {
